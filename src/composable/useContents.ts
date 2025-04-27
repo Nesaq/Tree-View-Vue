@@ -1,10 +1,11 @@
 import { ref } from 'vue'
+import type { Content } from '../types/ApiType.ts'
 
-const URL = 'https://prolegomenon.s3.amazonaws.com/contents.json'
+const URL: string = 'https://prolegomenon.s3.amazonaws.com/contents.json'
 
 export function useFetchData() {
-  const contents = ref<string[]>([])
-  // console.log('contents.value:', contents.value)
+  const state = ref<Content>()
+
   const loading = ref(false)
   const error = ref<Error | null>(null)
 
@@ -14,8 +15,11 @@ export function useFetchData() {
     try {
       // const response = await fetch('https://example.com/404.json');
       const response = await fetch(URL)
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки данных')
+      }
       const data = await response.json()
-      contents.value = data
+      state.value = data
     } catch (err) {
       error.value = err as Error
     } finally {
@@ -23,5 +27,5 @@ export function useFetchData() {
     }
   }
 
-  return { contents, loading, error, fetchContents }
+  return { state, loading, error, fetchContents }
 }
