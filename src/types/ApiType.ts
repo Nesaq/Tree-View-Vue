@@ -1,4 +1,4 @@
-type Page = {
+export type Page = {
   key: string
   name: string
   level: number
@@ -7,11 +7,15 @@ type Page = {
   childPageKeys?: string[] | null
 }
 
-type Pages = {
+export type Pages = {
   [key: string]: Page
 }
 
 export type Content = {
   pages: Pages
   rootLevelKeys: string[]
+}
+
+export type TreeNode = Page & {
+  children: TreeNode[]
 }
