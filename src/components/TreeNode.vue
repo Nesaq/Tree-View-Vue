@@ -1,23 +1,32 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import type { TreeNode } from '../types/ApiType'
 
 const props = defineProps<{
   node: TreeNode
 }>()
 
+const route = useRoute()
+
 const isExpanded = ref<boolean>(false)
-const isSelected = ref<boolean>(false)
+// const isSelected = ref<boolean>(false)
 
 function toggleExpand() {
   if (hasChildren.value) {
     isExpanded.value = !isExpanded.value
   }
-  isSelected.value = true
+  // isSelected.value = true
 }
 
 const hasChildren = computed(() => {
   return props.node.children && props.node.children.length > 0
+})
+
+// активна ли ссылка
+const isActive = computed(() => {
+  if (!props.node.link) return false
+  return route.path === `/${props.node.link}`
 })
 
 const indentStyle = computed(() => {
@@ -32,13 +41,18 @@ const indentStyle = computed(() => {
   <li>
     <div
       class="node-content"
-      @click="toggleExpand"
+      :class="{ selected: isActive }"
       :style="indentStyle"
-      :class="{ selected: isSelected }"
+      @click="toggleExpand"
     >
       <span class="arrow" :class="{ expanded: isExpanded, visible: hasChildren }"> ▶ </span>
-      <span>{{ node.name }}</span>
+
+      <router-link v-if="node.link" :to="`/${node.link}`" class="node-link">
+        {{ node.name }}
+      </router-link>
+      <span v-else>{{ node.name }}</span>
     </div>
+
     <ul v-if="isExpanded && hasChildren">
       <TreeNode v-for="child in node.children" :key="child.key" :node="child" />
     </ul>
@@ -47,27 +61,35 @@ const indentStyle = computed(() => {
 
 <style scoped>
 ul {
-  /* margin-left: 20px; */
   list-style-type: none;
   padding-left: 0;
 }
 li {
-  margin-top: 0px;
+  margin-top: 0;
   padding: 0;
 }
-
 .node-content {
   display: flex;
   align-items: center;
-  cursor: pointer;
+  /* cursor: pointer; */
   user-select: none;
-  padding: 5px 0;
+  padding: 4px 0;
+}
+.node-content.selected .node-link {
+  font-weight: bold;
+  color: #1890ff;
 }
 
-.node-content.selected {
-  background-color: #e6f7ff;
-  font-weight: bold;
+.node-link {
+  text-decoration: none;
+  color: inherit;
+  flex-grow: 1;
+  cursor: pointer;
 }
+.node-content.selected {
+  /* background-color: #e6f7ff; */
+}
+
 .arrow {
   display: inline-block;
   width: 1em;
@@ -76,12 +98,11 @@ li {
   text-align: center;
   opacity: 0;
   color: #555;
+  cursor: pointer;
 }
-
 .arrow.visible {
   opacity: 1;
 }
-
 .arrow.expanded {
   transform: rotate(90deg);
 }
