@@ -6,17 +6,26 @@ import type { TreeNode } from '../types/ApiType'
 const props = defineProps<{
   node: TreeNode
   parentKeys: Set<string>
+  filterActive?: boolean
 }>()
 
 const route = useRoute()
 
 const isInitiallyExpanded = computed(() => {
-  return props.parentKeys.has(props.node?.key)
+  return props.parentKeys.has(props.node.key)
 })
-const isExpanded = ref<boolean>(isInitiallyExpanded.value)
 
-watch(isInitiallyExpanded, (newValue) => {
-  isExpanded.value = newValue
+const isExpanded = ref(
+  // Если фильтр активен, и нода имеет детей, раскрываем ее по умолчанию
+  (props.filterActive && props.node.children && props.node.children.length > 0) ||
+    isInitiallyExpanded.value,
+)
+
+watch([isInitiallyExpanded, () => props.filterActive], ([newExpandedAncestor, newFilterActive]) => {
+  // Раскрываем, если фильтр активен (и есть дети) или если это родитель активной ноды
+  isExpanded.value =
+    (newFilterActive && props.node.children && props.node.children.length > 0) ||
+    newExpandedAncestor
 })
 
 function toggleExpand() {
@@ -56,7 +65,6 @@ const indentStyle = computed(() => {
       <router-link v-if="node.link" :to="`/${node.link}`" class="node-link">
         {{ node.name }}
       </router-link>
-      <!-- <span v-else>{{ node.name }}</span> -->
       <span v-else @click="toggleExpand" class="node-link">{{ node.name }}</span>
     </div>
 
@@ -66,6 +74,7 @@ const indentStyle = computed(() => {
         :key="child.key"
         :node="child"
         :parent-keys="parentKeys"
+        :filter-active="filterActive"
       />
     </ul>
   </li>
