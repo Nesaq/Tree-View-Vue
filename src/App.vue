@@ -1,12 +1,11 @@
 <script setup lang="ts">
-// import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import TableOfContents from './components/TableOfContents.vue'
 </script>
 
 <template>
   <header>
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <TableOfContents />
     </div>
   </header>
 
