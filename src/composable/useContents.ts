@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { Content, TreeNode, Pages, Page } from '../types/ApiType.ts'
-import { buildTree } from '../utyls/buildTree.ts'
+import { buildTree } from '../utils/buildTree.ts'
 
 const URL: string = 'https://prolegomenon.s3.amazonaws.com/contents.json'
 
