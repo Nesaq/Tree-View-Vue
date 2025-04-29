@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { TreeNode } from '../types/ApiType'
 
 const props = defineProps<{
   node: TreeNode
+  parentKeys: Set<string>
 }>()
 
 const route = useRoute()
 
-const isExpanded = ref<boolean>(false)
-// const isSelected = ref<boolean>(false)
+const isInitiallyExpanded = computed(() => {
+  return props.parentKeys.has(props.node?.key)
+})
+const isExpanded = ref<boolean>(isInitiallyExpanded.value)
+
+watch(isInitiallyExpanded, (newValue) => {
+  isExpanded.value = newValue
+})
 
 function toggleExpand() {
   if (hasChildren.value) {
     isExpanded.value = !isExpanded.value
   }
-  // isSelected.value = true
 }
 
 const hasChildren = computed(() => {
@@ -39,22 +45,28 @@ const indentStyle = computed(() => {
 
 <template>
   <li>
-    <div
-      class="node-content"
-      :class="{ selected: isActive }"
-      :style="indentStyle"
-      @click="toggleExpand"
-    >
-      <span class="arrow" :class="{ expanded: isExpanded, visible: hasChildren }"> ▶ </span>
-
+    <div class="node-content" :class="{ selected: isActive }" :style="indentStyle">
+      <span
+        class="arrow"
+        :class="{ expanded: isExpanded, visible: hasChildren }"
+        @click.stop="toggleExpand"
+      >
+        ▶
+      </span>
       <router-link v-if="node.link" :to="`/${node.link}`" class="node-link">
         {{ node.name }}
       </router-link>
-      <span v-else>{{ node.name }}</span>
+      <!-- <span v-else>{{ node.name }}</span> -->
+      <span v-else @click="toggleExpand" class="node-link">{{ node.name }}</span>
     </div>
 
     <ul v-if="isExpanded && hasChildren">
-      <TreeNode v-for="child in node.children" :key="child.key" :node="child" />
+      <TreeNode
+        v-for="child in node.children"
+        :key="child.key"
+        :node="child"
+        :parent-keys="parentKeys"
+      />
     </ul>
   </li>
 </template>
@@ -85,20 +97,24 @@ li {
   color: inherit;
   flex-grow: 1;
   cursor: pointer;
-}
-.node-content.selected {
-  /* background-color: #e6f7ff; */
+  padding: 2px 5px;
 }
 
 .arrow {
   display: inline-block;
   width: 1em;
+  height: 1.5em;
+  line-height: 1.5em;
   margin-right: 5px;
   transition: transform 0.1s ease-in-out;
   text-align: center;
   opacity: 0;
   color: #555;
   cursor: pointer;
+  border-radius: 10px;
+}
+.arrow:hover {
+  color: #1890ff;
 }
 .arrow.visible {
   opacity: 1;

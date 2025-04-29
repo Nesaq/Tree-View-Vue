@@ -3,11 +3,11 @@ import { onMounted } from 'vue'
 import { useFetchData } from '../composable/useContents'
 import TreeNode from './TreeNode.vue'
 
-const { loading, error, fetchContents, tree } = useFetchData()
+const { loading, error, fetchContents, tree, activeNodeKeys } = useFetchData()
 
-defineProps<{
-  msg: string
-}>()
+// defineProps<{
+//   msg: string
+// }>()
 
 onMounted(() => {
   fetchContents()
@@ -20,7 +20,12 @@ onMounted(() => {
     <div v-if="loading">Загрузка...</div>
     <div v-else-if="error">Ошибка: {{ error.message }}</div>
     <ul v-else-if="tree.length > 0">
-      <TreeNode v-for="rootNode in tree" :key="rootNode.key" :node="rootNode" />
+      <TreeNode
+        v-for="rootNode in tree"
+        :key="rootNode.key"
+        :node="rootNode"
+        :parent-keys="activeNodeKeys"
+      />
     </ul>
     <div v-else>Нет данных</div>
   </div>
@@ -34,6 +39,7 @@ onMounted(() => {
   font-family: sans-serif;
   height: 100vh;
   overflow-y: auto;
+  background-color: #f9f9f9;
 }
 
 ul {
