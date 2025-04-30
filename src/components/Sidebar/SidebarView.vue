@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, toRef } from 'vue'
+import { computed, toRef, type PropType } from 'vue'
 import type { TreeNode } from '@/types/ApiType'
 import { provideSidebar } from '@/composables/useSidebar'
 
@@ -8,30 +8,36 @@ import { filterTree } from '@/utils/filterTree'
 import SidebarSearch from '@/components/Sidebar/SidebarSearch.vue'
 import SidebarTree from '@/components/Sidebar/SidebarTree.vue'
 
-const props = defineProps<{
-  data: TreeNode[] | undefined | null
-  activeNodeKeys: Set<string>
+const props = defineProps({
+  data: {
+    type: Array as PropType<TreeNode[] | undefined | null>,
+    default: () => [],
+  },
+  activeNodeKeys: {
+    type: Set as PropType<Set<string>>,
+    required: true,
+  },
+  selectedKey: {
+    // Проп для v-model:selectedKey
+    type: String as PropType<string | null>,
+    default: null,
+  },
+})
+
+// Определяем Emits
+const emit = defineEmits<{
+  (e: 'update:selectedKey', key: string | null): void
+  (e: 'select', node: TreeNode | null): void
+  (e: 'toggle', key: string, isOpen: boolean): void
 }>()
 
+// Передаем реактивные ссылки на пропсы и emit в provideSidebar
 const activeKeysRef = toRef(props, 'activeNodeKeys')
+// Ref для пропа selectedKey
+const selectedKeyRef = toRef(props, 'selectedKey')
 
-// Получаем состояние фильтра из useSidebar
-const { debouncedFilterText, isFilterActive, setOpenKeys, selectNode } = provideSidebar()
-
-// Синхронизация состояния useSidebar с URL (через activeNodeKeys)
-watch(
-  activeKeysRef,
-  (newActiveKeys) => {
-    setOpenKeys(newActiveKeys)
-
-    let activeNodeKey: string | null = null
-    if (newActiveKeys.size > 0) {
-      activeNodeKey = Array.from(newActiveKeys)[0] ?? null
-    }
-    selectNode(activeNodeKey)
-  },
-  { immediate: true },
-)
+// Получаем состояние фильтра (остальное управляется через emit/props)
+const { debouncedFilterText, isFilterActive } = provideSidebar(activeKeysRef, selectedKeyRef, emit)
 
 // Фильтруем дерево на основе props.data и состояния из useSidebar
 const filteredTree = computed(() => {

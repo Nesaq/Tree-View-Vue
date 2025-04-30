@@ -8,13 +8,13 @@ const props = defineProps<{
 }>()
 
 //  состояние и методы из контекста
-const { openKeys, selectedKey, toggleNode, selectNode, isFilterActive } = useSidebar()
+const { openKeys, isNodeSelected, toggleNode, selectNode, isFilterActive } = useSidebar()
 
 // Определяем, раскрыта ли нода, на основе состояния из useSidebar
 const isExpanded = computed(() => {
   // Раскрыта, если ее ключ есть в openKeys
   const isOpen = openKeys.value.has(props.node.key)
-  // или если фильтр активен и у ноды есть дети (авто-раскрытие при фильтре)
+  // или если фильтр активен и у ноды есть дети (автораскрытие при фильтре)
   const autoOpen = isFilterActive.value && hasChildren.value
   return isOpen || autoOpen
 })
@@ -26,20 +26,20 @@ const hasChildren = computed(() => {
 
 // Определяем, активна ли нода (выбрана)
 const isActive = computed(() => {
-  return selectedKey.value === props.node.key
+  // Используем функцию isNodeSelected из useSidebar
+  return isNodeSelected(props.node.key)
 })
 
 // Функция для клика по стрелке или тексту (если нет ссылки)
 function handleToggleExpand() {
   if (hasChildren.value) {
-    // Раскрывать/сворачивать можно только если есть дети
     toggleNode(props.node.key)
   }
 }
 
 // Функция для клика по ссылке
 function handleSelect() {
-  selectNode(props.node.key)
+  selectNode(props.node.key, props.node)
 }
 
 // Отступ
