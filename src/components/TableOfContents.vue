@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { useFetchData } from '../composable/useContents'
+import { useContents } from '../composables/useContents'
 import TreeNode from './TreeNode.vue'
 import { filterTree } from '@/utils/filterTree'
-import { useDebouncedRef } from '@/composable/useDebounce'
+import { useDebouncedRef } from '@/composables/useDebounce'
 
-const { loading, error, fetchContents, tree, activeNodeKeys } = useFetchData()
+const { loading, error, fetchContents, tree, activeNodeKeys } = useContents()
 
 const {
   inputRef: filterInputText,

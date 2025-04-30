@@ -4,7 +4,7 @@ import type { TreeNode } from '../types/ApiType'
 function filterNode(node: TreeNode, query: string): TreeNode | null {
   const nodeMatches = node.name.toLowerCase().includes(query)
 
-  // Если нода сама совпала — возвращаем её целиком, вместе со всеми детьми
+  // Если нода сама совпала - возвращаем её целиком, вместе со всеми детьми
   if (nodeMatches) {
     return {
       ...node,
@@ -26,8 +26,6 @@ function filterNode(node: TreeNode, query: string): TreeNode | null {
       children: filteredChildren,
     }
   }
-
-  // Иначе — не включаем в дерево
   return null
 }
 

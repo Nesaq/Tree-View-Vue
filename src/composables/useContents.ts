@@ -1,11 +1,11 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import type { Content, TreeNode, Pages, Page } from '../types/ApiType.ts'
-import { buildTree } from '../utils/buildTree.ts'
+import type { Content, TreeNode, Pages, Page } from '@/types/ApiType'
+import { buildTree } from '@/utils/buildTree'
 
 const URL: string = 'https://prolegomenon.s3.amazonaws.com/contents.json'
 
-export function useFetchData() {
+export function useContents() {
   const route = useRoute()
   const state = ref<Content | null>(null)
   const loading = ref(false)
