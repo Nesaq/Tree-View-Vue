@@ -62,9 +62,11 @@ const hasVisibleData = computed(() => filteredTree.value.length > 0)
 
     <div class="sidebar-content">
       <template v-if="hasVisibleData">
-        <slot>
-          <SidebarTree :nodes="filteredTree" />
-        </slot>
+        <SidebarTree :nodes="filteredTree">
+          <template v-slot:node="slotProps">
+            <slot name="node" v-bind="slotProps"></slot>
+          </template>
+        </SidebarTree>
       </template>
       <template v-else>
         <slot name="empty">

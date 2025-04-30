@@ -7,7 +7,21 @@ const props = defineProps<{
   node: TreeNode
 }>()
 
-//  состояние и методы из контекста
+// Cлоты и их пропсы
+defineSlots<{
+  node(props: {
+    node: TreeNode
+    isExpanded: boolean
+    isActive: boolean
+    hasChildren: boolean
+    level: number
+    handleToggleExpand: () => void
+    handleSelect: () => void
+    indentStyle: { paddingLeft: string }
+  }): void
+}>()
+
+// Cостояние и методы из контекста
 const { openKeys, isNodeSelected, toggleNode, selectNode, isFilterActive } = useSidebar()
 
 // Определяем, раскрыта ли нода, на основе состояния из useSidebar
@@ -47,38 +61,68 @@ const indentStyle = computed(() => {
   const indentSize = 20
   return { paddingLeft: `${props.node.level * indentSize}px` }
 })
+
+// Данные для слота
+const slotProps = computed(() => ({
+  node: props.node,
+  isExpanded: isExpanded.value,
+  isActive: isActive.value,
+  hasChildren: hasChildren.value,
+  level: props.node.level,
+  handleToggleExpand: handleToggleExpand,
+  handleSelect: handleSelect,
+  indentStyle: indentStyle.value,
+}))
 </script>
 
 <template>
   <li>
-    <div class="node-content" :class="{ selected: isActive }" :style="indentStyle">
-      <span
-        class="arrow"
-        :class="{ expanded: isExpanded, visible: hasChildren }"
-        @click.stop="handleToggleExpand"
+    <slot name="node" v-bind="slotProps">
+      <div
+        class="node-content"
+        :class="{ selected: slotProps.isActive }"
+        :style="slotProps.indentStyle"
       >
-        ▶
-      </span>
-      <router-link v-if="node.link" :to="`/${node.link}`" class="node-link" @click="handleSelect">
-        {{ node.name }}
-      </router-link>
+        <!-- Стрелка для раскрытия/сворачивания -->
+        <span
+          class="arrow"
+          :class="{ expanded: slotProps.isExpanded, visible: slotProps.hasChildren }"
+          @click.stop="slotProps.handleToggleExpand"
+        >
+          ▶
+        </span>
 
-      <span
-        v-else
-        @click="
-          () => {
-            handleSelect()
-            handleToggleExpand()
-          }
-        "
-        class="node-link"
-      >
-        {{ node.name }}
-      </span>
-    </div>
+        <!-- Ссылка (если есть link) -->
+        <router-link
+          v-if="slotProps.node.link"
+          :to="`/${slotProps.node.link}`"
+          class="node-link"
+          @click="slotProps.handleSelect"
+        >
+          {{ slotProps.node.name }}
+        </router-link>
 
-    <ul v-if="isExpanded && hasChildren">
-      <SidebarNode v-for="child in node.children" :key="child.key" :node="child" />
+        <!-- Обычный текст (если нет link) -->
+        <span
+          v-else
+          @click="
+            () => {
+              slotProps.handleSelect()
+              slotProps.handleToggleExpand()
+            }
+          "
+          class="node-link"
+        >
+          {{ slotProps.node.name }}
+        </span>
+      </div>
+    </slot>
+    <ul v-if="slotProps.isExpanded && slotProps.hasChildren">
+      <SidebarNode v-for="child in slotProps.node.children" :key="child.key" :node="child">
+        <template v-slot:node="childSlotProps">
+          <slot name="node" v-bind="childSlotProps"></slot>
+        </template>
+      </SidebarNode>
     </ul>
   </li>
 </template>

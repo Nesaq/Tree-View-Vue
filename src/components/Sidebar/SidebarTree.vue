@@ -9,7 +9,11 @@ const props = defineProps<{
 
 <template>
   <ul class="sidebar-tree">
-    <SidebarNode v-for="node in props.nodes" :key="node.key" :node="node" />
+    <SidebarNode v-for="node in props.nodes" :key="node.key" :node="node">
+      <template v-slot:node="slotProps">
+        <slot name="node" v-bind="slotProps"></slot>
+      </template>
+    </SidebarNode>
   </ul>
 </template>
 
