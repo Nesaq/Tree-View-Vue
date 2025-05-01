@@ -85,33 +85,37 @@ const hasVisibleData = computed(() => filteredTree.value.length > 0)
   flex-direction: column;
   width: 300px;
   height: 100vh;
-  border-right: 1px solid #eee;
-  background-color: #f9f9f9;
+  border-right: 1px solid var(--sidebar-border-color);
+  background-color: var(--sidebar-bg-color);
+  color: var(--sidebar-text-color);
   font-family: sans-serif;
   overflow: hidden;
+  font-size: 14px;
 }
 
 .sidebar-header {
-  padding: 1rem 1rem 0.5rem 1rem;
+  padding: 16px 16px 8px 16px;
   flex-shrink: 0;
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: bold;
+  color: #000;
 }
 
 .sidebar-search-wrapper {
-  padding: 0.5rem 1rem 1rem 1rem;
+  padding: 8px 16px 16px 16px;
   flex-shrink: 0;
 }
 
 .sidebar-content {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 0 1rem 1rem 1rem;
+  scroll-behavior: smooth;
+  padding: 0 16px 16px 16px;
 }
 
 .sidebar-empty {
   text-align: center;
-  color: #777;
-  padding-top: 2rem;
+  color: #6c757d;
+  padding: 32px 16px;
 }
 </style>

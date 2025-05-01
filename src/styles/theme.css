@@ -1,0 +1,49 @@
+:root {
+  --sidebar-bg-color: #ffffff; /* Белый фон */
+  --sidebar-text-color: #414d5c; /* Темно-серый текст */
+  --sidebar-border-color: #e9ecef; /* Светлая граница */
+  --node-text-color: var(--sidebar-text-color);
+  --node-hover-bg-color: #f8f9fa; /* Очень легкий фон при ховере */
+  --node-selected-bg-color: transparent; /* Без фона для выделенного */
+  --node-selected-text-color: #0073bb; /* Синий цвет */
+  --node-indent-size: 16px; /* Отступ поменьше */
+  --arrow-color: #6c757d; /* Серый цвет стрелки */
+  --arrow-hover-color: var(--node-selected-text-color); /* Синий при ховере */
+  --search-border-color: #ced4da; /* Стандартный серый для границы */
+  --search-focus-border-color: #86b7fe; /* Синий для фокуса (Bootstrap-like) */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

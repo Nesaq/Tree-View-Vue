@@ -7,7 +7,12 @@ const { filterInputText, clearFilter } = useSidebar()
 
 <template>
   <div class="sidebar-search">
-    <input type="text" v-model="filterInputText" placeholder="Фильтр..." class="filter-input" />
+    <input
+      type="text"
+      class="sidebar-search-input"
+      placeholder="Фильтр..."
+      v-model="filterInputText"
+    />
     <button
       v-if="filterInputText"
       @click="clearFilter()"
@@ -23,13 +28,31 @@ const { filterInputText, clearFilter } = useSidebar()
 .sidebar-search {
   position: relative;
 }
-.filter-input {
+.sidebar-search-input {
   width: 100%;
-  padding: 8px 25px 8px 10px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border: 1px solid var(--search-border-color);
   border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  line-height: 1.5;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
+
+/* Стиль при фокусе */
+.sidebar-search-input:focus {
+  border-color: var(--search-focus-border-color);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.sidebar-search-input::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
 .clear-button {
   position: absolute;
   right: 5px;

@@ -117,19 +117,22 @@ const slotProps = computed(() => ({
         </span>
       </div>
     </slot>
-    <ul v-if="slotProps.isExpanded && slotProps.hasChildren">
-      <SidebarNode v-for="child in slotProps.node.children" :key="child.key" :node="child">
-        <template v-slot:node="childSlotProps">
-          <slot name="node" v-bind="childSlotProps"></slot>
-        </template>
-      </SidebarNode>
-    </ul>
+    <Transition name="slide-fade">
+      <ul v-if="slotProps.isExpanded && slotProps.hasChildren">
+        <SidebarNode v-for="child in slotProps.node.children" :key="child.key" :node="child">
+          <template v-slot:node="childSlotProps">
+            <slot name="node" v-bind="childSlotProps"></slot>
+          </template>
+        </SidebarNode>
+      </ul>
+    </Transition>
   </li>
 </template>
 <style scoped>
 ul {
   list-style-type: none;
   padding-left: 0;
+  margin: 0;
 }
 li {
   margin-top: 0;
@@ -138,43 +141,85 @@ li {
 .node-content {
   display: flex;
   align-items: center;
-  /* cursor: pointer; */
   user-select: none;
-  padding: 4px 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 4px;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
 }
+
 .node-content.selected .node-link {
+  color: var(--node-selected-text-color);
   font-weight: bold;
-  color: #1890ff;
+  text-decoration: none;
 }
 
 .node-link {
   text-decoration: none;
-  color: inherit;
+  color: var(--node-text-color);
   flex-grow: 1;
   cursor: pointer;
   padding: 2px 5px;
+  /* white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; */
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Ограничиваем количество строк до 2 */
+  -webkit-box-orient: vertical; /* Ориентируем бокс вертикально */
+  overflow: hidden;
+}
+
+.node-link:hover {
+  text-decoration: none;
+}
+.node-content:hover .node-link {
+  color: var(--node-selected-text-color);
 }
 
 .arrow {
   display: inline-block;
-  width: 1em;
-  height: 1.5em;
-  line-height: 1.5em;
-  margin-right: 5px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  margin-right: 4px;
   transition: transform 0.1s ease-in-out;
   text-align: center;
   opacity: 0;
-  color: #555;
+  color: var(--arrow-color);
   cursor: pointer;
   border-radius: 10px;
 }
 .arrow:hover {
-  color: #1890ff;
+  color: var(--arrow-hover-color);
 }
 .arrow.visible {
   opacity: 1;
 }
 .arrow.expanded {
   transform: rotate(90deg);
+}
+/* Стили для Transition slide-fade */
+.slide-fade-enter-active {
+  transition: all 0.2s ease-out; /* Время и функция анимации появления */
+}
+.slide-fade-leave-active {
+  transition: all 0.2s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-5px); /* Легкий сдвиг вверх при появлении/исчезновении */
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+
+/* Конечное состояние для enter (начальное для leave уже есть у ul) */
+.slide-fade-enter-to,
+.slide-fade-leave-from {
+  max-height: 500px;
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
