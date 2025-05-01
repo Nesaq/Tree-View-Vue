@@ -18,7 +18,7 @@ onMounted(() => {
 
 <template>
   <div class="app-layout">
-    <div v-if="loading" class="sidebar-placeholder">Загрузка оглавления...</div>
+    <div v-if="loading" class="sidebar-placeholder">Загрузка...</div>
     <div v-else-if="error" class="sidebar-placeholder">Ошибка: {{ error.message }}</div>
     <SidebarView
       v-else
