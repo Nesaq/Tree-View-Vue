@@ -167,6 +167,7 @@ li {
   display: -webkit-box;
   -webkit-line-clamp: 2; /* Ограничиваем количество строк до 2 */
   -webkit-box-orient: vertical; /* Ориентируем бокс вертикально */
+  line-clamp: 2;
   overflow: hidden;
 }
 
