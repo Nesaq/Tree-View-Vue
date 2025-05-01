@@ -4,6 +4,12 @@ import type { Content, TreeNode, Pages, Page } from '@/types/ApiType'
 import { buildTree } from '@/utils/buildTree'
 
 const URL: string = 'https://prolegomenon.s3.amazonaws.com/contents.json'
+const MAX_RETRIES = 2
+const RETRY_DELAY = 1000
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 export function useContents() {
   const route = useRoute()
@@ -48,25 +54,36 @@ export function useContents() {
     return keys
   })
 
-  async function fetchContents() {
-    if (state.value || loading.value) {
-      return
+  async function fetchContents(retriesLeft = MAX_RETRIES) {
+    // Устанавливаем loading и сбрасываем ошибку только при самом первом вызове
+    if (retriesLeft === MAX_RETRIES) {
+      loading.value = true
+      error.value = null
     }
     loading.value = true
     error.value = null
     try {
       const response = await fetch(URL)
       if (!response.ok) {
-        throw new Error('Ошибка загрузки данных')
+        throw new Error(`Ошибка загрузки данных: ${response.status} ${response.statusText}`)
       }
       const data = await response.json()
       state.value = data
-    } catch (err) {
-      error.value = err as Error
-    } finally {
+      error.value = null
       loading.value = false
+    } catch (err) {
+      console.error(`Попытка загрузки не удалась (осталось ${retriesLeft} повторов):`, err)
+      if (retriesLeft > 0) {
+        console.log(`Осталось попыток: ${retriesLeft - 1}. Повтор через ${RETRY_DELAY}мс...`)
+        await delay(RETRY_DELAY)
+        await fetchContents(retriesLeft - 1)
+      } else {
+        console.error('Все попытки загрузки исчерпаны.')
+        error.value = err as Error
+        loading.value = false
+      }
     }
   }
 
-  return { tree, loading, error, fetchContents, activeNodeKeys }
+  return { tree, loading, error, fetchContents, activeNodeKeys, state }
 }

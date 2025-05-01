@@ -4,12 +4,15 @@ import { onMounted, ref } from 'vue'
 import SidebarView from './components/Sidebar/SidebarView.vue'
 import { useContents } from './composables/useContents'
 
-const { tree, activeNodeKeys, loading, error, fetchContents } = useContents()
+const { tree, activeNodeKeys, loading, error, fetchContents, state } = useContents()
 // ref для v-model
 const selectedSidebarKey = ref<string | null>(null)
 
 onMounted(() => {
-  fetchContents()
+  // Вызываем загрузку только если данных еще нет
+  if (!state.value) {
+    fetchContents()
+  }
 })
 </script>
 
