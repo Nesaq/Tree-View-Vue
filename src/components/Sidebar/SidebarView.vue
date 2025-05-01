@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef, type PropType } from 'vue'
+import { computed, toRef, type PropType, ref } from 'vue'
 import type { TreeNode } from '@/types/ApiType'
 import { provideSidebar } from '@/composables/useSidebar'
 
@@ -31,6 +31,12 @@ const emit = defineEmits<{
   (e: 'toggle', key: string, isOpen: boolean): void
 }>()
 
+const isCollapsed = ref<boolean>(false)
+
+function toggleCollapse() {
+  isCollapsed.value = !isCollapsed.value
+}
+
 // Передаем реактивные ссылки на пропсы и emit в provideSidebar
 const activeKeysRef = toRef(props, 'activeNodeKeys')
 // Ref для пропа selectedKey
@@ -50,40 +56,53 @@ const hasVisibleData = computed(() => filteredTree.value.length > 0)
 </script>
 
 <template>
-  <aside class="sidebar">
-    <header class="sidebar-header" v-if="$slots.header">
-      <slot name="header"></slot>
-    </header>
-    <div class="sidebar-search-wrapper">
-      <slot name="search">
-        <SidebarSearch />
-      </slot>
-    </div>
-
-    <div class="sidebar-content">
-      <template v-if="hasVisibleData">
-        <SidebarTree :nodes="filteredTree">
-          <template v-slot:node="slotProps">
-            <slot name="node" v-bind="slotProps"></slot>
-          </template>
-        </SidebarTree>
-      </template>
-      <template v-else>
-        <slot name="empty">
-          <div class="sidebar-empty">
-            {{ isFilterActive ? 'Ничего не найдено' : 'Нет данных' }}
-          </div>
+  <aside class="sidebar" :class="{ collapsed: isCollapsed }">
+    <template v-if="!isCollapsed">
+      <header class="sidebar-header" v-if="$slots.header">
+        <slot name="header"></slot>
+      </header>
+      <div class="sidebar-search-wrapper">
+        <slot name="search">
+          <SidebarSearch />
         </slot>
-      </template>
-    </div>
+      </div>
+      <div class="sidebar-content">
+        <template v-if="hasVisibleData">
+          <SidebarTree :nodes="filteredTree">
+            <template v-slot:node="slotProps">
+              <slot name="node" v-bind="slotProps"></slot>
+            </template>
+          </SidebarTree>
+        </template>
+        <template v-else>
+          <slot name="empty">
+            <div class="sidebar-empty">
+              {{ isFilterActive ? 'Ничего не найдено' : 'Нет данных' }}
+            </div>
+          </slot>
+        </template>
+      </div>
+    </template>
+
+    <footer class="sidebar-footer">
+      <slot name="footer" :isCollapsed="isCollapsed" :toggleCollapse="toggleCollapse">
+        <button @click="toggleCollapse" class="collapse-button">
+          <span v-if="isCollapsed">▶</span>
+          <span v-else>◀</span>
+        </button>
+      </slot>
+    </footer>
   </aside>
 </template>
 
 <style scoped>
 .sidebar {
   display: flex;
+  position: relative;
+  transition: width 0.3s ease;
+  background-color: var(--sidebar-bg-color);
   flex-direction: column;
-  width: 300px;
+  width: var(--sidebar-width, 300px);
   height: 100vh;
   border-right: 1px solid var(--sidebar-border-color);
   background-color: var(--sidebar-bg-color);
@@ -91,6 +110,12 @@ const hasVisibleData = computed(() => filteredTree.value.length > 0)
   font-family: sans-serif;
   overflow: hidden;
   font-size: 14px;
+}
+
+/* Стили для свернутого состояния */
+.sidebar.collapsed {
+  width: 50px;
+  overflow: hidden;
 }
 
 .sidebar-header {
@@ -117,5 +142,42 @@ const hasVisibleData = computed(() => filteredTree.value.length > 0)
   text-align: center;
   color: #6c757d;
   padding: 32px 16px;
+}
+.sidebar-footer {
+  padding: 8px 16px;
+  border-top: 1px solid var(--sidebar-border-color);
+  flex-shrink: 0;
+  margin-top: auto;
+  background-color: var(--sidebar-bg-color);
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-footer {
+  padding: 8px;
+}
+
+.sidebar.collapsed .collapse-button {
+  width: auto;
+  padding: 5px;
+  margin: 0 auto;
+}
+
+.collapse-button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--sidebar-border-color);
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--sidebar-text-color);
+  transition: background-color 0.2s ease;
+}
+
+.collapse-button:hover {
+  background-color: #f0f0f0;
 }
 </style>
