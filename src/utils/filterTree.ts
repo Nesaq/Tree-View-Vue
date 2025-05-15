@@ -1,4 +1,4 @@
-import type { TreeNode } from '../types/ApiType'
+import type { TreeNode } from '@/types/ApiType'
 
 // Рекурсивная функция для фильтрации ноды и её детей
 function filterNode(node: TreeNode, query: string): TreeNode | null {

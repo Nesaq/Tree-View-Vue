@@ -24,7 +24,6 @@ const props = defineProps({
   },
 })
 
-// Определяем Emits
 const emit = defineEmits<{
   (e: 'update:selectedKey', key: string | null): void
   (e: 'select', node: TreeNode | null): void
